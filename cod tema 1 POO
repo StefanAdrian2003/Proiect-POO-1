@@ -1,0 +1,185 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+class Carte
+{
+
+private:
+    string titlu;
+    string autor;
+    bool disponibila;
+
+public:
+    Carte(const string& titlu, const string& autor)
+        : titlu(titlu), autor(autor), disponibila(true) {}
+
+    string Titlu() const
+    {
+        return titlu;
+    }
+
+    string Autor() const
+    {
+        return autor;
+    }
+
+    bool Este_Disponibila() const
+    {
+        return disponibila;
+    }
+
+    void Imprumuta()
+    {
+        disponibila = false;
+    }
+
+    void Returneaza()
+    {
+        disponibila = true;
+    }
+};
+
+class Utilizator {
+
+private:
+    string nume;
+    int numar_Carti_Imprumutate; // Adaugăm un nou membru de date
+
+public:
+    Utilizator(const string& nume) : nume(nume), numar_Carti_Imprumutate(0) {} // Inițializăm numărul la 0
+
+    string Nume() const {
+        return nume;
+    }
+
+    int NumarCartiImprumutate() const {
+        return numar_Carti_Imprumutate;
+    }
+
+    // Metodă pentru a incrementa numărul de cărți imprumutate
+    void Imprumuta_Carte() {
+        numar_Carti_Imprumutate++;
+    }
+
+    // Metodă pentru a decrementa numărul de cărți imprumutate
+    void Returneaza_Carte() {
+        if (numar_Carti_Imprumutate > 0) {
+            numar_Carti_Imprumutate--;
+        }
+    }
+};
+
+
+class Biblioteca
+{
+
+private:
+    vector<Carte> carti;
+    vector<Utilizator> utilizatori;
+
+public:
+    void Adauga_Carte(const string& titlu, const string& autor)
+    {
+        Carte carte(titlu, autor);
+        carti.push_back(carte);
+    }
+
+    void Inregistreaza_Utilizator(const string& nume)
+    {
+        Utilizator utilizator(nume);
+        utilizatori.push_back(utilizator);
+    }
+
+    void Imprumuta_Carte(const string& titlu, const string& nume_Utilizator)
+    {
+        int nr_carti;
+        for (Carte& carte : carti)
+        {
+            if (carte.Titlu() == titlu && carte.Este_Disponibila())
+            {
+                carte.Imprumuta();
+                for (Utilizator& utilizator : utilizatori)
+                {
+                    if (utilizator.Nume() == nume_Utilizator)
+                    {
+                        utilizator.Imprumuta_Carte();
+                        nr_carti=utilizator.NumarCartiImprumutate();
+                        break;
+                    }
+                }
+                cout << "Cartea " << titlu << " a fost imprumutata de " << nume_Utilizator << ". ";
+                cout<<"(Carti imprumutate in total: "<<nr_carti<<")"<<endl;
+                return;
+            }
+        }
+        cout << "Cartea nu este disponibila sau nu exista." << endl;
+    }
+
+    void Returneaza_Carte(const string& titlu, const string& nume_Utilizator)
+    {
+        int nr_carti;
+        for (Carte& carte : carti)
+        {
+            if (carte.Titlu() == titlu && !carte.Este_Disponibila())
+            {
+                carte.Returneaza();
+                for (Utilizator& utilizator : utilizatori)
+                {
+                    if (utilizator.Nume() == nume_Utilizator)
+                    {
+                        utilizator.Returneaza_Carte();
+                        nr_carti=utilizator.NumarCartiImprumutate();
+                        break;
+                    }
+                }
+                cout << "Cartea " << titlu << " a fost returnata de " <<nume_Utilizator<<". ";
+                cout<<"(Carti imprumutate in total: "<<nr_carti<<")"<<endl;
+                return;
+            }
+        }
+        cout << "Cartea nu a fost imprumutata sau nu exista." << endl;
+    }
+};
+
+int main()
+{
+    Biblioteca biblioteca;
+
+    biblioteca.Adauga_Carte("Comuniune", "Ann Patchett");
+    biblioteca.Adauga_Carte("Orbi", "Petronela Rotar");
+    biblioteca.Adauga_Carte("Paradis", "Abdulrazak Gurnah");
+    biblioteca.Adauga_Carte("Povestea lui Casey Han", "Min Jin Lee");
+    biblioteca.Adauga_Carte("Un basm", "Stephen King");
+    biblioteca.Adauga_Carte("Anihilare", "Michel Houellebecq");
+    biblioteca.Adauga_Carte("Lupanarul", "Elodie Harper");
+    biblioteca.Adauga_Carte("Ion", "Liviu Rebreanu");
+    biblioteca.Adauga_Carte("Enigma Otiliei", "George Calinescu");
+    biblioteca.Adauga_Carte("Ultima noapte de dragoste, intaia noapte de razboi", "Camil Petrescu");
+
+    biblioteca.Inregistreaza_Utilizator("Stefan");
+    biblioteca.Inregistreaza_Utilizator("Laura");
+    biblioteca.Inregistreaza_Utilizator("Maria");
+    biblioteca.Inregistreaza_Utilizator("George");
+    biblioteca.Inregistreaza_Utilizator("Alex");
+    biblioteca.Inregistreaza_Utilizator("Elena");
+    biblioteca.Inregistreaza_Utilizator("Andrei");
+    biblioteca.Inregistreaza_Utilizator("Ionut");
+
+    biblioteca.Imprumuta_Carte("Ultima noapte de dragoste, intaia noapte de razboi", "Laura");
+    biblioteca.Imprumuta_Carte("Enigma Otiliei", "Laura");
+    biblioteca.Imprumuta_Carte("Ion", "Alex");
+    biblioteca.Imprumuta_Carte("Lupanarul", "Stefan");
+    biblioteca.Imprumuta_Carte("Comuniune", "Stefan");
+    biblioteca.Imprumuta_Carte("Orbi", "Laura");
+    biblioteca.Imprumuta_Carte("Paradis", "Elena");
+    biblioteca.Imprumuta_Carte("Un basm", "Maria");
+
+    biblioteca.Returneaza_Carte("Ultima noapte de dragoste, intaia noapte de razboi", "Laura");
+    biblioteca.Returneaza_Carte("Comuniune", "Stefan");
+    biblioteca.Returneaza_Carte("Paradis", "Elena");
+    biblioteca.Returneaza_Carte("Paradis", "Elena");
+    return 0;
+}
